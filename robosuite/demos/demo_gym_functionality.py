@@ -33,14 +33,16 @@ demonstrates how this can be easily achieved by using the GymWrapper.
 
 import robosuite as suite
 from robosuite.wrappers import GymWrapper
+from robosuite.environments.manipulation.lift_features import speed, finite_diff_speed, height, distance_to_bottle, distance_to_cube
+import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
 
     # Notice how the environment is wrapped by the wrapper
     env = GymWrapper(
         suite.make(
-            "Lift",
-            robots="Sawyer",  # use Sawyer robot
+            "LiftModded",
+            robots="Jaco",
             use_camera_obs=False,  # do not use pixel observations
             has_offscreen_renderer=False,  # not needed since not using pixel obs
             has_renderer=True,  # make sure we can render to the screen
@@ -49,12 +51,28 @@ if __name__ == "__main__":
         )
     )
 
-    for i_episode in range(20):
-        observation = env.reset()
-        for t in range(500):
-            env.render()
-            action = env.action_space.sample()
-            observation, reward, done, info = env.step(action)
-            if done:
-                print("Episode finished after {} timesteps".format(t + 1))
-                break
+    # for i_episode in range(1):
+    observation = env.reset()
+    speeds = []
+    fd_speeds = []
+    for t in range(500):
+        env.render()
+        action = env.action_space.sample()
+        observation, reward, done, info = env.step(action)
+        speeds.append(speed(observation))
+        fd_speeds.append(finite_diff_speed(observation))
+        print("speed:", speeds[-1])
+        print("speed via finite differences:", fd_speeds[-1])
+        print("height:", height(observation))
+        print("distance to bottle:", distance_to_bottle(observation))
+        print("distance to cube:", distance_to_cube(observation))
+        if done:
+            print("Episode finished after {} timesteps".format(t + 1))
+            break
+    fig1 = plt.figure("speeds")
+    plt.plot(speeds)
+
+    fd_speeds.pop(0)  # The first finite diff value won't make sense, since our initial prev_eef_pos is np.zeros(3).
+    fig2 = plt.figure("fd_speeds")
+    plt.plot(fd_speeds)
+    plt.show()
