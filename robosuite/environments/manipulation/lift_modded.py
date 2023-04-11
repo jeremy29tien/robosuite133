@@ -164,6 +164,7 @@ class LiftModded(Lift):
         camera_segmentations=None,  # {None, instance, class, element}
         renderer="mujoco",
         renderer_config=None,
+        weights=(0.0, 0.0, 0.0, 0.0, 0.0)
     ):
 
         super().__init__(
@@ -197,6 +198,31 @@ class LiftModded(Lift):
             renderer=renderer,
             renderer_config=renderer_config,
         )
+        self.weights = weights
+
+    def reward(self, action=None):
+        gt_reward = super(LiftModded, self).reward()
+
+        hand_vel = self.robots[0]._hand_vel
+        speed = np.linalg.norm(hand_vel, 2)
+
+        eef_pos = self._eef_xpos()
+        height = eef_pos[2]
+
+        bottle_pos = np.array(self.sim.data.body_xpos[self.bottle_body_id])
+        gripper_to_bottle_pos = eef_pos - bottle_pos
+        distance_to_bottle = np.linalg.norm(gripper_to_bottle_pos, 2)
+
+        cube_pos = np.array(self.sim.data.body_xpos[self.cube_body_id])
+        gripper_to_cube_pos = eef_pos - cube_pos
+        distance_to_cube = np.linalg.norm(gripper_to_cube_pos, 2)
+
+        features = np.asarray([gt_reward, speed, height, distance_to_bottle, distance_to_cube])
+        weights = np.asarray(self.weights)  # TODO: fill this in with how to input weights.
+        assert len(features.shape) == 1
+        assert len(weights.shape) == 1
+        reward = np.dot(features, weights)
+        return reward
 
     def _load_model(self):
         """
