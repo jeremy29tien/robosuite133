@@ -206,7 +206,7 @@ class LiftModded(Lift):
         hand_vel = self.robots[0]._hand_vel
         speed = np.linalg.norm(hand_vel, 2)
 
-        eef_pos = self._eef_xpos()
+        eef_pos = self._eef_xpos
         height = eef_pos[2]
 
         bottle_pos = np.array(self.sim.data.body_xpos[self.bottle_body_id])
