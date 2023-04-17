@@ -58,6 +58,8 @@ if __name__ == "__main__":
     for t in range(500):
         env.render()
         action = env.action_space.sample()
+        print("obs:", len(observation))
+        print("action:", len(action))
         observation, reward, done, info = env.step(action)
         speeds.append(speed(observation))
         fd_speeds.append(finite_diff_speed(observation))
@@ -69,10 +71,10 @@ if __name__ == "__main__":
         if done:
             print("Episode finished after {} timesteps".format(t + 1))
             break
-    fig1 = plt.figure("speeds")
-    plt.plot(speeds)
-
-    fd_speeds.pop(0)  # The first finite diff value won't make sense, since our initial prev_eef_pos is np.zeros(3).
-    fig2 = plt.figure("fd_speeds")
-    plt.plot(fd_speeds)
-    plt.show()
+    # fig1 = plt.figure("speeds")
+    # plt.plot(speeds)
+    #
+    # fd_speeds.pop(0)  # The first finite diff value won't make sense, since our initial prev_eef_pos is np.zeros(3).
+    # fig2 = plt.figure("fd_speeds")
+    # plt.plot(fd_speeds)
+    # plt.show()
