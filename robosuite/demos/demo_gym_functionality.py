@@ -43,11 +43,13 @@ if __name__ == "__main__":
         suite.make(
             "LiftModded",
             robots="Jaco",
-            use_camera_obs=False,  # do not use pixel observations
-            has_offscreen_renderer=False,  # not needed since not using pixel obs
-            has_renderer=True,  # make sure we can render to the screen
+            use_object_obs=True,
+            use_camera_obs=True,  # do not use pixel observations
+            has_offscreen_renderer=True,  # not needed since not using pixel obs
+            has_renderer=False,  # make sure we can render to the screen
             reward_shaping=True,  # use dense rewards
             control_freq=20,  # control should happen fast enough so that simulation looks smooth
+            controller='OSC_POSITION',
         )
     )
 
@@ -56,7 +58,7 @@ if __name__ == "__main__":
     speeds = []
     fd_speeds = []
     for t in range(500):
-        env.render()
+        #env.render()
         action = env.action_space.sample()
         print("obs:", len(observation))
         print("action:", len(action))
