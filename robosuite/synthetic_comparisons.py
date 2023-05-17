@@ -101,7 +101,7 @@ def generate_synthetic_comparisons_commands(traj1, traj2, traj1_gtrewards, traj2
         traj1_feature_values = [traj1_gtrewards[t] for t in range(horizon)]
         traj2_feature_values = [traj2_gtrewards[t] for t in range(horizon)]
 
-        if np.mean(traj1_feature_values) > np.mean(traj2_feature_values):  # Here, we take the MEAN gt_reward
+        if np.mean(traj1_feature_values) < np.mean(traj2_feature_values):  # Here, we take the MEAN gt_reward
             commands = ["Lift the cube " + w + "." for w in greater_gtreward_adjs]
             return commands
         else:
@@ -112,7 +112,7 @@ def generate_synthetic_comparisons_commands(traj1, traj2, traj1_gtrewards, traj2
         traj1_feature_values = [speed(traj1[t]) for t in range(horizon)]
         traj2_feature_values = [speed(traj2[t]) for t in range(horizon)]
 
-        if np.mean(traj1_feature_values) > np.mean(traj2_feature_values):  # Here, we take the MEAN speed
+        if np.mean(traj1_feature_values) < np.mean(traj2_feature_values):  # Here, we take the MEAN speed
             commands = ["Move " + w + "." for w in greater_speed_adjs]
             return commands
         else:
@@ -123,7 +123,7 @@ def generate_synthetic_comparisons_commands(traj1, traj2, traj1_gtrewards, traj2
         traj1_feature_values = [height(traj1[t]) for t in range(horizon)]
         traj2_feature_values = [height(traj2[t]) for t in range(horizon)]
 
-        if np.mean(traj1_feature_values) > np.mean(traj2_feature_values):  # Here, we take the MEAN height
+        if np.mean(traj1_feature_values) < np.mean(traj2_feature_values):  # Here, we take the MEAN height
             commands = ["Move " + w + "." for w in greater_height_adjs]
             return commands
         else:
@@ -135,7 +135,7 @@ def generate_synthetic_comparisons_commands(traj1, traj2, traj1_gtrewards, traj2
         traj2_feature_values = [distance_to_bottle(traj2[t]) for t in range(horizon)]
 
         # TODO: Later, we can make this non-Markovian (e.g., the MINIMUM distance)
-        if np.mean(traj1_feature_values) > np.mean(traj2_feature_values):  # Here, we take the MEAN distance
+        if np.mean(traj1_feature_values) < np.mean(traj2_feature_values):  # Here, we take the MEAN distance
             commands = ["Move " + w + " from the bottle." for w in greater_distance_adjs]
             return commands
         else:
@@ -148,7 +148,73 @@ def generate_synthetic_comparisons_commands(traj1, traj2, traj1_gtrewards, traj2
         traj2_feature_values = [distance_to_cube(traj2[t]) for t in range(horizon)]
 
         # TODO: Later, we can make this non-Markovian (e.g., the FINAL distance)
-        if np.mean(traj1_feature_values) > np.mean(traj2_feature_values):  # Here, we take the MEAN distance
+        if np.mean(traj1_feature_values) < np.mean(traj2_feature_values):  # Here, we take the MEAN distance
+            commands = ["Move " + w + " from the cube." for w in greater_distance_adjs]
+            return commands
+        else:
+            commands = ["Move " + w + " to the cube." for w in less_distance_adjs]
+            return commands
+
+
+# NOTE: For this function, we produce commands that would change traj1 to traj2.
+# We generate n comparisons per trajectory pair, where the proportion that are correctly labeled
+# is equal to the sigmoid of the difference in the feature values.
+def generate_noisyaugmented_synthetic_comparisons_commands(traj1, traj2, traj1_gtrewards, traj2_gtrewards, feature_name, n_duplicates):
+    horizon = len(traj1)
+    traj1_feature_values = None
+    traj2_feature_values = None
+    if feature_name == "gt_reward":
+        traj1_feature_values = [traj1_gtrewards[t] for t in range(horizon)]
+        traj2_feature_values = [traj2_gtrewards[t] for t in range(horizon)]
+
+        if np.mean(traj1_feature_values) < np.mean(traj2_feature_values):  # Here, we take the MEAN gt_reward
+            commands = ["Lift the cube " + w + "." for w in greater_gtreward_adjs]
+            return commands
+        else:
+            commands = ["Lift the cube " + w + "." for w in less_gtreward_adjs]
+            return commands
+
+    elif feature_name == "speed":
+        traj1_feature_values = [speed(traj1[t]) for t in range(horizon)]
+        traj2_feature_values = [speed(traj2[t]) for t in range(horizon)]
+
+        if np.mean(traj1_feature_values) < np.mean(traj2_feature_values):  # Here, we take the MEAN speed
+            commands = ["Move " + w + "." for w in greater_speed_adjs]
+            return commands
+        else:
+            commands = ["Move " + w + "." for w in less_speed_adjs]
+            return commands
+
+    elif feature_name == "height":
+        traj1_feature_values = [height(traj1[t]) for t in range(horizon)]
+        traj2_feature_values = [height(traj2[t]) for t in range(horizon)]
+
+        if np.mean(traj1_feature_values) < np.mean(traj2_feature_values):  # Here, we take the MEAN height
+            commands = ["Move " + w + "." for w in greater_height_adjs]
+            return commands
+        else:
+            commands = ["Move " + w + "." for w in less_height_adjs]
+            return commands
+
+    elif feature_name == "distance_to_bottle":
+        traj1_feature_values = [distance_to_bottle(traj1[t]) for t in range(horizon)]
+        traj2_feature_values = [distance_to_bottle(traj2[t]) for t in range(horizon)]
+
+        # TODO: Later, we can make this non-Markovian (e.g., the MINIMUM distance)
+        if np.mean(traj1_feature_values) < np.mean(traj2_feature_values):  # Here, we take the MEAN distance
+            commands = ["Move " + w + " from the bottle." for w in greater_distance_adjs]
+            return commands
+        else:
+            # Move further from the bottle.
+            commands = ["Move " + w + " to the bottle." for w in less_distance_adjs]
+            return commands
+
+    elif feature_name == "distance_to_cube":
+        traj1_feature_values = [distance_to_cube(traj1[t]) for t in range(horizon)]
+        traj2_feature_values = [distance_to_cube(traj2[t]) for t in range(horizon)]
+
+        # TODO: Later, we can make this non-Markovian (e.g., the FINAL distance)
+        if np.mean(traj1_feature_values) < np.mean(traj2_feature_values):  # Here, we take the MEAN distance
             commands = ["Move " + w + " from the cube." for w in greater_distance_adjs]
             return commands
         else:
