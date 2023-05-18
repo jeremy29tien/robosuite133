@@ -12,6 +12,56 @@ greater_distance_adjs = ["further", "farther", "more distant"]
 less_distance_adjs = ["closer", "nearer", "more nearby"]
 
 
+GT_REWARD_MEAN = None
+GT_REWARD_STD = None
+SPEED_MEAN = None
+SPEED_STD = None
+HEIGHT_MEAN = None
+HEIGHT_STD = None
+DISTANCE_TO_BOTTLE_MEAN = None
+DISTANCE_TO_BOTTLE_STD = None
+DISTANCE_TO_CUBE_MEAN = None
+DISTANCE_TO_CUBE_STD = None
+
+
+def calc_and_set_global_vars(trajs, traj_rewards):
+    horizon = len(trajs[0])
+    avg_gt_rewards = []
+    avg_speeds = []
+    avg_heights = []
+    avg_distance_to_bottles = []
+    avg_distance_to_cubes = []
+
+    for traj, traj_reward in zip(trajs, traj_rewards):
+        avg_gt_rewards.append(np.mean([traj_reward[t] for t in range(horizon)]))
+        avg_speeds.append(np.mean([speed(traj[t]) for t in range(horizon)]))
+        avg_heights.append(np.mean([height(traj[t]) for t in range(horizon)]))
+        avg_distance_to_bottles.append(np.mean([distance_to_bottle(traj[t]) for t in range(horizon)]))
+        avg_distance_to_cubes.append(np.mean([distance_to_cube(traj[t]) for t in range(horizon)]))
+
+    global GT_REWARD_MEAN
+    global GT_REWARD_STD
+    global SPEED_MEAN
+    global SPEED_STD
+    global HEIGHT_MEAN
+    global HEIGHT_STD
+    global DISTANCE_TO_BOTTLE_MEAN
+    global DISTANCE_TO_BOTTLE_STD
+    global DISTANCE_TO_CUBE_MEAN
+    global DISTANCE_TO_CUBE_STD
+
+    GT_REWARD_MEAN = np.mean(avg_gt_rewards)
+    GT_REWARD_STD = np.std(avg_gt_rewards)
+    SPEED_MEAN = np.mean(avg_speeds)
+    SPEED_STD = np.std(avg_speeds)
+    HEIGHT_MEAN = np.mean(avg_heights)
+    HEIGHT_STD = np.std(avg_speeds)
+    DISTANCE_TO_BOTTLE_MEAN = np.mean(avg_distance_to_bottles)
+    DISTANCE_TO_BOTTLE_STD = np.std(avg_speeds)
+    DISTANCE_TO_CUBE_MEAN = np.mean(avg_distance_to_cubes)
+    DISTANCE_TO_CUBE_STD = np.std(avg_speeds)
+
+
 # This function takes in two trajectories in the form of LISTS of (observation, action) pairs.
 # Features:
 # GT reward (mean)
@@ -159,6 +209,7 @@ def generate_synthetic_comparisons_commands(traj1, traj2, traj1_gtrewards, traj2
 # NOTE: For this function, we produce commands that would change traj1 to traj2.
 # We generate n comparisons per trajectory pair, where the proportion that are greaterly labeled
 # is equal to the sigmoid of the difference in the feature values.
+# IMPORTANT: User needs to have run calc_and_set_global_vars() at some point before this function.
 def generate_noisyaugmented_synthetic_comparisons_commands(traj1, traj2, traj1_gtrewards, traj2_gtrewards, feature_name, n_duplicates):
     horizon = len(traj1)
     traj1_feature_values = None
@@ -168,7 +219,7 @@ def generate_noisyaugmented_synthetic_comparisons_commands(traj1, traj2, traj1_g
         traj2_feature_values = [traj2_gtrewards[t] for t in range(horizon)]
 
         feature_diff = np.mean(traj2_feature_values) - np.mean(traj1_feature_values)
-        greater_prob = 1 / (1 + np.exp(-feature_diff))
+        greater_prob = 1 / (1 + np.exp(-feature_diff/GT_REWARD_STD))
         num_greater = int(np.around(n_duplicates * greater_prob))
         num_lesser = n_duplicates - num_greater
 
@@ -185,7 +236,7 @@ def generate_noisyaugmented_synthetic_comparisons_commands(traj1, traj2, traj1_g
         traj2_feature_values = [speed(traj2[t]) for t in range(horizon)]
 
         feature_diff = np.mean(traj2_feature_values) - np.mean(traj1_feature_values)
-        greater_prob = 1 / (1 + np.exp(-feature_diff))
+        greater_prob = 1 / (1 + np.exp(-feature_diff/SPEED_STD))
         num_greater = int(np.around(n_duplicates * greater_prob))
         num_lesser = n_duplicates - num_greater
 
@@ -202,7 +253,7 @@ def generate_noisyaugmented_synthetic_comparisons_commands(traj1, traj2, traj1_g
         traj2_feature_values = [height(traj2[t]) for t in range(horizon)]
 
         feature_diff = np.mean(traj2_feature_values) - np.mean(traj1_feature_values)
-        greater_prob = 1 / (1 + np.exp(-feature_diff))
+        greater_prob = 1 / (1 + np.exp(-feature_diff/HEIGHT_STD))
         num_greater = int(np.around(n_duplicates * greater_prob))
         num_lesser = n_duplicates - num_greater
 
@@ -219,7 +270,7 @@ def generate_noisyaugmented_synthetic_comparisons_commands(traj1, traj2, traj1_g
         traj2_feature_values = [distance_to_bottle(traj2[t]) for t in range(horizon)]
 
         feature_diff = np.mean(traj2_feature_values) - np.mean(traj1_feature_values)
-        greater_prob = 1 / (1 + np.exp(-feature_diff))
+        greater_prob = 1 / (1 + np.exp(-feature_diff/DISTANCE_TO_BOTTLE_STD))
         num_greater = int(np.around(n_duplicates * greater_prob))
         num_lesser = n_duplicates - num_greater
 
@@ -236,7 +287,7 @@ def generate_noisyaugmented_synthetic_comparisons_commands(traj1, traj2, traj1_g
         traj2_feature_values = [distance_to_cube(traj2[t]) for t in range(horizon)]
 
         feature_diff = np.mean(traj2_feature_values) - np.mean(traj1_feature_values)
-        greater_prob = 1 / (1 + np.exp(-feature_diff))
+        greater_prob = 1 / (1 + np.exp(-feature_diff/DISTANCE_TO_CUBE_STD))
         num_greater = int(np.around(n_duplicates * greater_prob))
         num_lesser = n_duplicates - num_greater
 
