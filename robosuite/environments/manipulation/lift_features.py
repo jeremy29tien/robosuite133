@@ -7,6 +7,7 @@ for the **LiftModded** task.
 
 
 def speed(gym_obs):
+    assert len(gym_obs) == 64 or len(gym_obs) == 68  # Ensure that we are using the right observation (64) or observation+action (68) space.
     object_state = gym_obs[0:24]
     proprio_state = gym_obs[24:64]
 
@@ -32,6 +33,7 @@ def finite_diff_speed(gym_obs):
 
 
 def height(gym_obs):
+    assert len(gym_obs) == 64 or len(gym_obs) == 68  # Ensure that we are using the right observation (64) or observation+action (68) space.
     object_state = gym_obs[0:24]
     proprio_state = gym_obs[24:64]
 
@@ -40,6 +42,7 @@ def height(gym_obs):
 
 
 def distance_to_bottle(gym_obs):
+    assert len(gym_obs) == 64 or len(gym_obs) == 68  # Ensure that we are using the right observation (64) or observation+action (68) space.
     object_state = gym_obs[0:24]
     proprio_state = gym_obs[24:64]
 
@@ -48,6 +51,7 @@ def distance_to_bottle(gym_obs):
 
 
 def distance_to_cube(gym_obs):
+    assert len(gym_obs) == 64 or len(gym_obs) == 68  # Ensure that we are using the right observation (64) or observation+action (68) space.
     object_state = gym_obs[0:24]
     proprio_state = gym_obs[24:64]
 
