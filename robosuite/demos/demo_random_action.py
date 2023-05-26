@@ -64,4 +64,6 @@ if __name__ == "__main__":
     for i in range(10000):
         action = np.random.uniform(low, high)
         obs, reward, done, _ = env.step(action)
+        print("obs:", obs)
+        print("reward:", reward)
         env.render()
