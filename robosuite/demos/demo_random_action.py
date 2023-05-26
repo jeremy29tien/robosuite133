@@ -48,9 +48,9 @@ if __name__ == "__main__":
     # initialize the task
     env = suite.make(
         **options,
-        has_renderer=True,
+        has_renderer=False,
         has_offscreen_renderer=False,
-        ignore_done=True,
+        ignore_done=False,
         use_camera_obs=False,
         control_freq=20,
     )
