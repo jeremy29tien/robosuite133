@@ -55,7 +55,7 @@ if __name__ == "__main__":
         control_freq=20,
     )
     env.reset()
-    env.viewer.set_camera(camera_id=0)
+    # env.viewer.set_camera(camera_id=0)
 
     # Get action limits
     low, high = env.action_spec
