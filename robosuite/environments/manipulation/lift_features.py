@@ -6,6 +6,32 @@ for the **LiftModded** task.
 """
 
 
+def gt_reward(gym_obs):
+    assert len(gym_obs) == 64 or len(
+        gym_obs) == 68  # Ensure that we are using the right observation (64) or observation+action (68) space.
+
+    object_state = gym_obs[0:24]
+    proprio_state = gym_obs[24:64]
+
+    reward = 0.0
+
+    # Check success (sparse completion reward)
+    cube_pos = object_state[0:3]
+    cube_height = cube_pos[2]
+    if cube_height > 0.04:  # refer to line 428 in lift.py. here, we assume table_height == 0
+        reward = 2.25
+
+    else:
+        # reaching reward
+        dist = distance_to_cube(gym_obs)
+        reaching_reward = 1 - np.tanh(10.0 * dist)
+        reward += reaching_reward
+
+        # grasping reward
+
+    return reward
+
+
 def speed(gym_obs):
     assert len(gym_obs) == 64 or len(gym_obs) == 68  # Ensure that we are using the right observation (64) or observation+action (68) space.
     object_state = gym_obs[0:24]
