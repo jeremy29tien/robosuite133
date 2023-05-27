@@ -362,10 +362,14 @@ class LiftModded(Lift):
             def hand_vel(obs_cache):
                 return self.robots[0]._hand_vel
 
+            @sensor(modality=modality)
+            def is_grasping_cube(obs_cache):
+                return int(self._check_grasp(gripper=self.robots[0].gripper, object_geoms=self.cube))
+
             # TODO: Define more methods as needed for adding features to the observation. For example, we would add
             # TODO: functions here for information about the bottle (other objects in the env other than the cube.
 
-            sensors = [bottle_pos, bottle_quat, gripper_to_bottle_pos, efc_vel, hand_vel]
+            sensors = [bottle_pos, bottle_quat, gripper_to_bottle_pos, efc_vel, hand_vel, is_grasping_cube]
             names = [s.__name__ for s in sensors]
 
             # Create observables
