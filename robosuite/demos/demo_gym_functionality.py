@@ -33,10 +33,13 @@ demonstrates how this can be easily achieved by using the GymWrapper.
 
 import robosuite as suite
 from robosuite.wrappers import GymWrapper
+from robosuite.controllers import load_controller_config
 from robosuite.environments.manipulation.lift_features import speed, finite_diff_speed, height, distance_to_bottle, distance_to_cube
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
+    controller_name = 'OSC_POSITION'
+    controller_configs = load_controller_config(default_controller=controller_name)
 
     # Notice how the environment is wrapped by the wrapper
     env = GymWrapper(
@@ -49,7 +52,7 @@ if __name__ == "__main__":
             has_renderer=False,  # make sure we can render to the screen
             reward_shaping=True,  # use dense rewards
             control_freq=20,  # control should happen fast enough so that simulation looks smooth
-            # controller_configs={'OSC_POSITION'},
+            controller_configs=controller_configs,
         )
     )
 
