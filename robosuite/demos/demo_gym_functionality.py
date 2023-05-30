@@ -63,8 +63,8 @@ if __name__ == "__main__":
     for t in range(500):
         #env.render()
         action = env.action_space.sample()
-        print("obs:", len(observation))
-        print("action:", len(action))
+        print("obs:", len(observation), observation)
+        print("action:", len(action), action)
         observation, reward, done, info = env.step(action)
         speeds.append(speed(observation))
         fd_speeds.append(finite_diff_speed(observation))
