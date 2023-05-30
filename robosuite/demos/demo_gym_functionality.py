@@ -34,7 +34,7 @@ demonstrates how this can be easily achieved by using the GymWrapper.
 import robosuite as suite
 from robosuite.wrappers import GymWrapper
 from robosuite.controllers import load_controller_config
-from robosuite.environments.manipulation.lift_features import speed, finite_diff_speed, height, distance_to_bottle, distance_to_cube
+from robosuite.environments.manipulation.lift_features import gt_reward, speed, finite_diff_speed, height, distance_to_bottle, distance_to_cube
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
@@ -66,10 +66,11 @@ if __name__ == "__main__":
         print("obs:", len(observation), observation)
         print("action:", len(action), action)
         observation, reward, done, info = env.step(action)
+        print("gt_reward:", gt_reward(observation))
         speeds.append(speed(observation))
-        fd_speeds.append(finite_diff_speed(observation))
+        # fd_speeds.append(finite_diff_speed(observation))
         print("speed:", speeds[-1])
-        print("speed via finite differences:", fd_speeds[-1])
+        # print("speed via finite differences:", fd_speeds[-1])
         print("height:", height(observation))
         print("distance to bottle:", distance_to_bottle(observation))
         print("distance to cube:", distance_to_cube(observation))
