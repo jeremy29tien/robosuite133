@@ -22,6 +22,7 @@ def gt_reward(gym_obs):
     # Check success (sparse completion reward)
     cube_pos = object_state[0:3]
     cube_height = cube_pos[2]
+    print("cube_height:", cube_height)
     if cube_height > 0.04:  # refer to line 428 in lift.py. here, we assume table_height == 0
         reward = 2.25
 
