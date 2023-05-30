@@ -44,7 +44,7 @@ if __name__ == "__main__":
             "LiftModded",
             robots="Jaco",
             use_object_obs=True,
-            use_camera_obs=True,  # do not use pixel observations
+            use_camera_obs=False,  # do not use pixel observations
             has_offscreen_renderer=True,  # not needed since not using pixel obs
             has_renderer=False,  # make sure we can render to the screen
             reward_shaping=True,  # use dense rewards
