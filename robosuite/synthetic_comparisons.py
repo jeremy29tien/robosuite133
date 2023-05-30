@@ -1,5 +1,5 @@
 import numpy as np
-from robosuite.environments.manipulation.lift_features import speed, height, distance_to_bottle, distance_to_cube
+from robosuite.environments.manipulation.lift_features import gt_reward, speed, height, distance_to_bottle, distance_to_cube
 
 
 greater_gtreward_adjs = ["better", "more successfully"]
@@ -24,7 +24,7 @@ DISTANCE_TO_CUBE_MEAN = None
 DISTANCE_TO_CUBE_STD = None
 
 
-def calc_and_set_global_vars(trajs, traj_rewards):
+def calc_and_set_global_vars(trajs):
     horizon = len(trajs[0])
     avg_gt_rewards = []
     avg_speeds = []
@@ -32,8 +32,8 @@ def calc_and_set_global_vars(trajs, traj_rewards):
     avg_distance_to_bottles = []
     avg_distance_to_cubes = []
 
-    for traj, traj_reward in zip(trajs, traj_rewards):
-        avg_gt_rewards.append(np.mean([traj_reward[t] for t in range(horizon)]))
+    for traj in trajs:
+        avg_gt_rewards.append(np.mean([gt_reward(traj[t]) for t in range(horizon)]))
         avg_speeds.append(np.mean([speed(traj[t]) for t in range(horizon)]))
         avg_heights.append(np.mean([height(traj[t]) for t in range(horizon)]))
         avg_distance_to_bottles.append(np.mean([distance_to_bottle(traj[t]) for t in range(horizon)]))
@@ -69,13 +69,13 @@ def calc_and_set_global_vars(trajs, traj_rewards):
 # Height (mean)
 # Distance to cube (final)
 # Distance to bottle (min)
-def generate_synthetic_comparisons_statements(traj1, traj2, traj1_gtrewards, traj2_gtrewards, feature_name):
+def generate_synthetic_comparisons_statements(traj1, traj2, feature_name):
     horizon = len(traj1)
     traj1_feature_values = None
     traj2_feature_values = None
     if feature_name == "gt_reward":
-        traj1_feature_values = [traj1_gtrewards[t] for t in range(horizon)]
-        traj2_feature_values = [traj2_gtrewards[t] for t in range(horizon)]
+        traj1_feature_values = [gt_reward(traj1[t]) for t in range(horizon)]
+        traj2_feature_values = [gt_reward(traj2[t]) for t in range(horizon)]
 
         if np.mean(traj1_feature_values) > np.mean(traj2_feature_values):  # Here, we take the MEAN gt_reward
             ordinary_comps = ["The first trajectory is " + w + " than the second trajectory." for w in greater_gtreward_adjs]
@@ -143,13 +143,13 @@ def generate_synthetic_comparisons_statements(traj1, traj2, traj1_gtrewards, tra
 
 
 # NOTE: For this function, we produce commands that would change traj1 to traj2.
-def generate_synthetic_comparisons_commands(traj1, traj2, traj1_gtrewards, traj2_gtrewards, feature_name):
+def generate_synthetic_comparisons_commands(traj1, traj2, feature_name):
     horizon = len(traj1)
     traj1_feature_values = None
     traj2_feature_values = None
     if feature_name == "gt_reward":
-        traj1_feature_values = [traj1_gtrewards[t] for t in range(horizon)]
-        traj2_feature_values = [traj2_gtrewards[t] for t in range(horizon)]
+        traj1_feature_values = [gt_reward(traj1[t]) for t in range(horizon)]
+        traj2_feature_values = [gt_reward(traj2[t]) for t in range(horizon)]
 
         if np.mean(traj1_feature_values) < np.mean(traj2_feature_values):  # Here, we take the MEAN gt_reward
             commands = ["Lift the cube " + w + "." for w in greater_gtreward_adjs]
@@ -210,13 +210,13 @@ def generate_synthetic_comparisons_commands(traj1, traj2, traj1_gtrewards, traj2
 # We generate n comparisons per trajectory pair, where the proportion that are greaterly labeled
 # is equal to the sigmoid of the difference in the feature values.
 # IMPORTANT: User needs to have run calc_and_set_global_vars() at some point before this function.
-def generate_noisyaugmented_synthetic_comparisons_commands(traj1, traj2, traj1_gtrewards, traj2_gtrewards, feature_name, n_duplicates):
+def generate_noisyaugmented_synthetic_comparisons_commands(traj1, traj2, feature_name, n_duplicates):
     horizon = len(traj1)
     traj1_feature_values = None
     traj2_feature_values = None
     if feature_name == "gt_reward":
-        traj1_feature_values = [traj1_gtrewards[t] for t in range(horizon)]
-        traj2_feature_values = [traj2_gtrewards[t] for t in range(horizon)]
+        traj1_feature_values = [gt_reward(traj1[t]) for t in range(horizon)]
+        traj2_feature_values = [gt_reward(traj2[t]) for t in range(horizon)]
 
         feature_diff = np.mean(traj2_feature_values) - np.mean(traj1_feature_values)
         greater_prob = 1 / (1 + np.exp(-feature_diff/GT_REWARD_STD))
