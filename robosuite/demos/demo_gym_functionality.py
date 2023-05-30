@@ -49,7 +49,7 @@ if __name__ == "__main__":
             has_renderer=False,  # make sure we can render to the screen
             reward_shaping=True,  # use dense rewards
             control_freq=20,  # control should happen fast enough so that simulation looks smooth
-            controller_configs='OSC_POSITION',
+            controller_configs={'OSC_POSITION'},
         )
     )
 
