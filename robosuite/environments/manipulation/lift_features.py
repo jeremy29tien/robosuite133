@@ -36,7 +36,7 @@ def gt_reward(gym_obs):
         is_grasping_cube = object_state[-1]
         if is_grasping_cube:
             reward += 0.25
-
+    print("total reward returned:", reward)
     return reward
 
 
