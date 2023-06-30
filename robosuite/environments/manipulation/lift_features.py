@@ -22,7 +22,7 @@ def gt_reward(gym_obs):
     # Check success (sparse completion reward)
     cube_pos = object_state[0:3]
     cube_height = cube_pos[2]
-    print("cube_height:", cube_height)
+    # print("cube_height:", cube_height)
     if cube_height > 0.9:  # refer to line 428 in lift.py. based on printing out the observation, the cube starts at a height of 0.81857747, and the bottle starts at a height of 0.88023976.
         reward = 2.25
 
@@ -31,13 +31,13 @@ def gt_reward(gym_obs):
         dist = distance_to_cube(gym_obs)
         reaching_reward = 1 - np.tanh(10.0 * dist)
         reward += reaching_reward
-        print("reaching_reward:", reaching_reward)
+        # print("reaching_reward:", reaching_reward)
 
         # grasping reward
         is_grasping_cube = object_state[-1]
         if is_grasping_cube:
             reward += 0.25
-    print("total reward returned:", reward)
+    # print("total reward returned:", reward)
     return reward
 
 
