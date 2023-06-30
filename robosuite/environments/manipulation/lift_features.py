@@ -30,6 +30,7 @@ def gt_reward(gym_obs):
         dist = distance_to_cube(gym_obs)
         reaching_reward = 1 - np.tanh(10.0 * dist)
         reward += reaching_reward
+        print("reaching_reward:", reaching_reward)
 
         # grasping reward
         is_grasping_cube = object_state[-1]
